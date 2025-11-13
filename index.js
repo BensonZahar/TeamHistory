@@ -1,0 +1,168 @@
+// JAS Menu Script by Deni_Pels (tg:denipels)
+const jasMenu = [
+    { name: "Тест 1", action: "test1" }
+];
+const ITEMS_PER_PAGE = 6;
+let currentPage = 0;
+let giveLicenseTo = -1;
+let targetId = null;
+let currentMenu = null;
+
+// JSK — фракционная история (объединённые и отсортированные записи)
+const jskOptions = [
+    { name: "Lars_Osterman изменил должность на Светотехник [№2] в ТРК \'Ритм\'<t>2025-08-25 17:12:48<n>", action: "jsk_view" },
+    { name: "Lars_Osterman принял в ТРК \'Ритм\' на должность Стажер [№1]<t>2025-08-25 16:39:20<n>", action: "jsk_view" },
+    { name: "Ryuto_Yamada изменил должность на Подполковник [№8] в Мин. внутренних дел<t>2025-11-02 20:45:02<n>", action: "jsk_view" },
+    { name: "Bruno_Castro изменил должность на Майор [№7] в Мин. внутренних дел<t>2025-10-31 21:47:03<n>", action: "jsk_view" },
+    { name: "Ryuto_Yamada изменил должность на Капитан [№6] в Мин. внутренних дел<t>2025-10-28 21:25:40<n>", action: "jsk_view" },
+    { name: "Bruno_Castro изменил должность на Лейтенант [№5] в Мин. внутренних дел<t>2025-10-27 20:34:22<n>", action: "jsk_view" },
+    { name: "Bruno_Castro изменил должность на Прапорщик [№4] в Мин. внутренних дел<t>2025-10-26 18:18:52<n>", action: "jsk_view" },
+    { name: "Ryuto_Yamada изменил должность на Старшина [№3] в Мин. внутренних дел<t>2025-10-25 16:02:18<n>", action: "jsk_view" },
+    { name: "Ryuto_Yamada изменил должность на Сержант [№2] в Мин. внутренних дел<t>2025-10-23 14:11:02<n>", action: "jsk_view" },
+    { name: "Ryuto_Yamada принял в Мин. внутренних дел на должность Рядовой [№1]<t>2025-10-22 12:23:11<n>", action: "jsk_view" }
+];
+
+// === /alis — ТОЧНАЯ КОПИЯ /alist (как на фото) ===
+const alisOptions = [
+];
+
+// Инициализация
+const initJasMenu = () => {
+    window.sendChatInputCustom = e => {
+        const args = e.split(" ");
+        if (args[0] === "/jas") {
+            targetId = args[1];
+            showJasMenu(args[1]);
+        } else if (args[0] === "/team_histor") {
+            targetId = args[1];
+            showJskMenu(args[1]);
+        } else if (args[0] === "/alis") {
+            targetId = args[1];
+            showAlisMenu(args[1]);
+        } else {
+            window.App.developmentMode || engine.trigger("SendChatInput", e);
+        }
+    };
+    window.sendClientEventCustom = (event, ...args) => {
+        if (args[0] === "OnDialogResponse" && args[1] === 670) {
+            const response = args[2]; // 1 = Button1, 0 = Button2, -1 = крестик
+            if (response === 1 && giveLicenseTo !== -1) {
+                if (currentMenu === "jas") {
+                    handleJasCommand(args[3]);
+                } else if (currentMenu === "jsk") {
+                    handleJskCommand(args[3]);
+                } else if (currentMenu === "alis") {
+                    handleAlisCommand(args[3]);
+                }
+            }
+        } else {
+            window.sendClientEventHandle?.(event, ...args);
+        }
+    };
+    window.sendChatInput = window.sendChatInputCustom;
+    window.sendClientEvent = window.sendClientEventCustom;
+    console.log("[JAS Menu] Загружен");
+    console.log("[JSK Menu] Добавлен");
+    console.log("[ALIS Menu] /alis — точная копия /alist (Style 0, белый текст)");
+};
+
+// === JAS ===
+window.showJasMenu = (e) => {
+    giveLicenseTo = e;
+    currentMenu = "jas";
+    let list = '';
+    jasMenu.forEach((item, i) => list += `${i + 1}. ${item.name}<n>`);
+    window.addDialogInQueue(`[670,2,"JAS Menu","","Выбрать","Отмена",0,0]`, list, 0);
+};
+
+// === JSK ===
+window.showJskMenu = (e) => {
+    giveLicenseTo = e;
+    currentMenu = "jsk";
+    let list = '';
+    jskOptions.forEach(item => list += `${item.name}<n>`);
+    window.addDialogInQueue(`[670,2,"Фракционная история","","Далее","Отмена",0,1]`, list, 0);
+};
+
+// === ALIS — ТОЧНО КАК НА ФОТО ===
+window.showAlisMenu = (playerId) => {
+    giveLicenseTo = playerId;
+    currentMenu = "alis";
+    const title = `{FFCD00}Последние 10 наказаний за 2 месяца`;
+    const header = `Тип наказания<t><t>Дата наказания<t>Ник администратора<t>Причина<n><n>`;
+    let body = "";
+    if (alisOptions.length === 0) {
+        body = `{FFFFFF}Список наказаний пуст`;
+    } else {
+        alisOptions.forEach(item => {
+            body += `{FFFFFF}${item.type}<t><t>${item.date}<t>${item.admin}<t>${item.reason}<n>`;
+        });
+    }
+    const dialog = `[670,0,"${title}","","Закрыть","",0,0]`;
+    window.addDialogInQueue(dialog, header + body, 0);
+};
+
+// === Обработка ===
+const handleJasCommand = (i) => {
+    if (i === 0) return;
+    const idx = i - 1;
+    if (idx >= 0 && idx < jasMenu.length) {
+        executeJasAction(jasMenu[idx].action, giveLicenseTo);
+    }
+};
+const handleJskCommand = (i) => {
+    if (i === 0) return;
+    const idx = i - 1;
+    if (idx >= 0 && idx < jskOptions.length) {
+        executeJskAction(jskOptions[idx].action, giveLicenseTo);
+    }
+};
+const handleAlisCommand = () => {
+    // Просто закрывается
+};
+
+// === Действия ===
+const executeJasAction = (action, targetId) => {
+    if (!targetId) targetId = giveLicenseTo;
+    switch (action) {
+        case "test1":
+            sendMessagesWithDelay([
+                "/me выполняет тестовое действие 1",
+                "/do Действие успешно выполнено."
+            ], [0, 1000]);
+            break;
+    }
+};
+const executeJskAction = (action, targetId) => {
+    if (!targetId) targetId = giveLicenseTo;
+    switch (action) {
+        case "jsk_view":
+            sendMessagesWithDelay([
+                "/me открыл служебный КПК",
+                "/do На экране отображается фракционная история.",
+                "/me изучает информацию на экране"
+            ], [0, 700, 700]);
+            break;
+    }
+};
+
+// === Задержка ===
+function sendMessagesWithDelay(messages, delays, index = 0) {
+    if (index >= messages.length) return;
+    setTimeout(() => {
+        sendChatInput(messages[index]);
+        sendMessagesWithDelay(messages, delays, index + 1);
+    }, delays[index]);
+}
+
+// === Запуск ===
+if (window.engine) {
+    initJasMenu();
+} else {
+    const check = setInterval(() => {
+        if (window.engine) {
+            clearInterval(check);
+            initJasMenu();
+        }
+    }, 100);
+}
