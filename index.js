@@ -1,3 +1,4 @@
+/*
 // JAS Menu Script by Deni_Pels (tg:denipels)
 const jasMenu = [
     { name: "Тест 1", action: "test1" }
@@ -166,3 +167,4 @@ if (window.engine) {
         }
     }, 100);
 }
+*/
