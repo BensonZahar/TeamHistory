@@ -1,5 +1,5 @@
 
-/* // JAS Menu Script by Deni_Pels (tg:denipels)
+ // JAS Menu Script by Deni_Pels (tg:denipels)
 const jasMenu = [
     { name: "Тест 1", action: "test1" }
 ];
@@ -12,7 +12,7 @@ let currentMenu = null;
 // JSK — фракционная история (объединённые и отсортированные записи)
 const jskOptions = [
     // === МВД — самые свежие ===
-    { name: "Ryuto_Yamada изменил должность на Подполковник [№8] в Мин. внутренних дел<t>2025-11-10 20:45:02<n>", action: "jsk_view" },
+    { name: "Sanek_Versace изменил должность на Подполковник [№8] в Мин. внутренних дел<t>2025-11-17 20:45:02<n>", action: "jsk_view" },
     { name: "Ryuto_Yamada изменил должность на Майор [№7] в Мин. внутренних дел<t>2025-11-08 18:27:19<n>", action: "jsk_view" },
     { name: "Ryuto_Yamada изменил должность на Капитан [№6] в Мин. внутренних дел<t>2025-11-06 14:11:33<n>", action: "jsk_view" },
     { name: "Ryuto_Yamada изменил должность на Лейтенант [№5] в Мин. внутренних дел<t>2025-11-04 22:05:47<n>", action: "jsk_view" },
@@ -171,5 +171,5 @@ if (window.engine) {
         }
     }, 100);
 }
-*/
+
 
